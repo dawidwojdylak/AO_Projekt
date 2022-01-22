@@ -1,9 +1,10 @@
 from PyQt5.QtWidgets import QApplication, QMainWindow, QAction, QFileDialog,\
         QLabel, QToolBar, QStatusBar, QVBoxLayout, QHBoxLayout,\
-        QMessageBox, QTextEdit, QWidget, QSpinBox
+        QMessageBox, QTextEdit, QWidget, QSpinBox, QPushButton, QLineEdit
 from PyQt5.QtGui import QPixmap, QPalette
 from PyQt5.QtCore import Qt
 from src.TextRead import TextRead
+import os
 
 class MainWindow(QMainWindow):
 
@@ -17,6 +18,7 @@ class MainWindow(QMainWindow):
         self.pixmap = None
         self.imagePath = None
         self.textRead = None
+        self.modelPath = None
         #create user interface
         self.initUI()
         #connect functionality with methods
@@ -29,20 +31,41 @@ class MainWindow(QMainWindow):
         Initialization of the User Interface
         """
         #set the horizontal layout
-        self.layout = QHBoxLayout()
+        self.layout = QVBoxLayout()
         widget = QWidget()
         widget.setLayout(self.layout)
+
+        self.layout.addWidget(QLabel('Model Panel'))
+
+        layoutModel1 = QHBoxLayout()
+        self.labelModel1 = QLabel('Load Model  (the model is not loaded)!')
+        layoutModel1.addWidget(self.labelModel1)
+
+        self.loadModelButton = QPushButton('Load Model', self)
+        self.loadModelButton.setToolTip('This button load a model file!')
+        layoutModel1.addWidget(self.loadModelButton)
+        self.layout.addLayout(layoutModel1)
+
+        layoutModel2 = QHBoxLayout()
+        labelModel2 = QLabel('Characters that are learned in the model:  ')
+        layoutModel2.addWidget(labelModel2)
+        self.textLineModel = QLineEdit('0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ')
+        layoutModel2.addWidget(self.textLineModel)
+        self.layout.addLayout(layoutModel2)
+
+        self.layoutBot = QHBoxLayout()
         #adding space for image
         self.label = QLabel('Place to display the loaded image!')
         self.label.setBackgroundRole(QPalette.Base)
-        self.layout.addWidget(self.label,1)
+        self.layoutBot.addWidget(self.label,1)
         #adding space for the text read
         self.textEdit =  QTextEdit()
         self.textEdit.setReadOnly(True)
         self.textEdit.clear()
         self.textEdit.insertPlainText("Load a image to read the content!")
-        self.layout.addWidget(self.textEdit,1)
+        self.layoutBot.addWidget(self.textEdit,1)
 
+        self.layout.addLayout(self.layoutBot)
         self.setCentralWidget(widget)
 
         #prepare closing app button
@@ -69,13 +92,11 @@ class MainWindow(QMainWindow):
         self.fontSizeSpinBox = QSpinBox()
         self.fontSizeSpinBox.setStatusTip('Set Text Size!')
         self.fontSizeSpinBox.setFocusPolicy(Qt.NoFocus)
-        self.fontSizeSpinBox.setValue(10)
+        self.fontSizeSpinBox.setValue(20)
         #prepare reset app button
         self.resetButton = QAction("Reset", self)
         self.resetButton.setStatusTip("Restores the input setting of the application")
         self.resetButton.setShortcut('Ctrl+R')
-
-        self.verticalLayout = QVBoxLayout(self)
 
         #Toolbar
         #file toolbar
@@ -103,6 +124,8 @@ class MainWindow(QMainWindow):
         editMenu.addAction(self.extractTextButton)
         #status bar
         self.setStatusBar(QStatusBar(self))
+        #Set font size
+        self.onChangedSizeSpinBox()
 
     def setupQtConnections(self):
         """
@@ -115,6 +138,7 @@ class MainWindow(QMainWindow):
         self.saveTextButton.triggered.connect(self.onClickedButtonSaveText)
         self.fontSizeSpinBox.valueChanged.connect(self.onChangedSizeSpinBox)
         self.resetButton.triggered.connect(self.onClickReset)
+        self.loadModelButton.clicked.connect(self.onClickLoadModelButton)
 
     def resizeEvent(self, event):
         """
@@ -179,9 +203,11 @@ class MainWindow(QMainWindow):
         Extract text from Image
         """
         if self.imagePath:
-            self.textRead = TextRead(self.imagePath)
+            self.textRead = TextRead(self.imagePath,list(self.textLineModel.text()),self.modelPath)
             self.textEdit.clear()
             self.textEdit.insertPlainText(str(self.textRead))
+            self.pixmap = self.textRead.getImg()
+            self.printImageWithCorrectSize()
 
     def onClickedButtonSaveText(self):
         """
@@ -207,3 +233,14 @@ class MainWindow(QMainWindow):
     def onClickReset(self):
         self.close()
         self.__init__()
+
+    def onClickLoadModelButton(self):
+        """
+        Method calling the window to select and load an model file.
+        """
+        fname = QFileDialog.getOpenFileName(self, 'Open file','\\', "Image files (*.h5)")
+        if not fname[0]:
+            QMessageBox.information(self, "Model", "Set correct name with model directory!.")
+            return
+        self.modelPath = fname[0]
+        self.labelModel1.setText(f'Load Model  (the model {os.path.basename(self.modelPath)} is loaded)!')
