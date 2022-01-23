@@ -1,0 +1,3 @@
+[console_scripts]
+text-reader = src.main:main
+

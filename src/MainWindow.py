@@ -1,10 +1,12 @@
+import os
 from PyQt5.QtWidgets import QApplication, QMainWindow, QAction, QFileDialog,\
-        QLabel, QToolBar, QStatusBar, QVBoxLayout, QHBoxLayout,\
+        QLabel, QStatusBar, QVBoxLayout, QHBoxLayout, \
         QMessageBox, QTextEdit, QWidget, QSpinBox, QPushButton, QLineEdit
 from PyQt5.QtGui import QPixmap, QPalette
 from PyQt5.QtCore import Qt
 from src.TextRead import TextRead
-import os
+from src.TrainModelDialog import TrainModelDialog
+
 
 class MainWindow(QMainWindow):
 
@@ -97,6 +99,10 @@ class MainWindow(QMainWindow):
         self.resetButton = QAction("Reset", self)
         self.resetButton.setStatusTip("Restores the input setting of the application")
         self.resetButton.setShortcut('Ctrl+R')
+        #prepare train app button
+        self.trainButton = QAction("Train Model", self)
+        self.trainButton.setStatusTip("Open a dialog to train model!")
+        self.trainButton.setShortcut('Ctrl+T')
 
         #Toolbar
         #file toolbar
@@ -105,6 +111,7 @@ class MainWindow(QMainWindow):
         fileToolBar.addAction(self.loadButton)
         fileToolBar.addAction(self.saveTextButton)
         fileToolBar.addAction(self.resetButton)
+        fileToolBar.addAction(self.trainButton)
         #edit toolbar
         editToolBar = self.addToolBar("Edit")
         editToolBar.addAction(self.copyTextButton)
@@ -118,6 +125,7 @@ class MainWindow(QMainWindow):
         fileMenu.addAction(self.loadButton)
         fileMenu.addAction(self.saveTextButton)
         fileMenu.addAction(self.resetButton)
+        fileMenu.addAction(self.trainButton)
         #edit menu
         editMenu = menubar.addMenu('&Edit')
         editMenu.addAction(self.copyTextButton)
@@ -139,6 +147,7 @@ class MainWindow(QMainWindow):
         self.fontSizeSpinBox.valueChanged.connect(self.onChangedSizeSpinBox)
         self.resetButton.triggered.connect(self.onClickReset)
         self.loadModelButton.clicked.connect(self.onClickLoadModelButton)
+        self.trainButton.triggered.connect(self.onClickTrainButton)
 
     def resizeEvent(self, event):
         """
@@ -244,3 +253,6 @@ class MainWindow(QMainWindow):
             return
         self.modelPath = fname[0]
         self.labelModel1.setText(f'Load Model  (the model {os.path.basename(self.modelPath)} is loaded)!')
+
+    def onClickTrainButton(self):
+        TrainModelDialog().exec()

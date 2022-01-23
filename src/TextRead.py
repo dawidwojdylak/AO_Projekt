@@ -45,11 +45,11 @@ class TextRead:
             cv2.rectangle(self.im, (x, y), (x + w, y + h), (0,0,255), 2)
             self.extractSingleCharFromImg(x,y,w,h,gray)
 
-    def extractSingleCharFromImg(self, x, y, w, h):
+    def extractSingleCharFromImg(self, x, y, w, h, img):
         """
         This method returns extract single char from image.
         """
-        obj=self.im[y:y+h,x:x+w]
+        obj=img[y:y+h,x:x+w]
         _,obj = cv2.threshold(obj,100,255,cv2.THRESH_BINARY)
         #set the borders (extra padding to your image)
         obj= cv2.copyMakeBorder(obj,10,10,10,10,cv2.BORDER_CONSTANT,value=(255,255,255))

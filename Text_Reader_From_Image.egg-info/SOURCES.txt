@@ -1,0 +1,13 @@
+README.md
+setup.py
+Text_Reader_From_Image.egg-info/PKG-INFO
+Text_Reader_From_Image.egg-info/SOURCES.txt
+Text_Reader_From_Image.egg-info/dependency_links.txt
+Text_Reader_From_Image.egg-info/entry_points.txt
+Text_Reader_From_Image.egg-info/requires.txt
+Text_Reader_From_Image.egg-info/top_level.txt
+src/MainWindow.py
+src/TextRead.py
+src/TrainModelDialog.py
+src/__init__.py
+src/main.py
