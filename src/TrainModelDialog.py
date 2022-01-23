@@ -183,3 +183,4 @@ class TrainModelDialog(QDialog):
             validation_steps=val_steps,
             shuffle=True
             )
+        
